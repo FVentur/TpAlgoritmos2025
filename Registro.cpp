@@ -13,10 +13,11 @@ using namespace std;
 
 const int MAX_VENDEDORES = 100;
 
-struct Vendedor {
-    int codigo_Vendedor;
-    char nombre_Vendedor[26];
-    char nombre_Sucursal[31];
+
+struct Vendedor{
+	int codigo;
+	char nombre[50];
+	char sucursal[50];
 };
 
 
@@ -35,9 +36,9 @@ void cargarDesdeArchivo(Vendedor vec[], int& len) {
     fclose(arch);
 }
 
-bool existeCodigo(int codigo, Vendedor vec[], int len) {
+bool existeCodigo(int codigoext, Vendedor vec[], int len) {
     for (int i = 0; i < len; i++) {
-        if (vec[i].codigo_Vendedor == codigo)
+        if (vec[i].codigo == codigoext)
             return true;
     }
     return false;
@@ -49,16 +50,16 @@ Vendedor pedirDatos() {
     string nombre, sucursal;
 
     cout << "Ingrese codigo del vendedor: ";
-    cin >> v.codigo_Vendedor;
+    cin >> v.codigo;
     cin.ignore();
 
     cout << "Ingrese nombre del vendedor: ";
     getline(cin, nombre);
-    strcpy(v.nombre_Vendedor, nombre.c_str());
+    strcpy(v.nombre, nombre.c_str());
 
     cout << "Ingrese nombre de la sucursal: ";
     getline(cin, sucursal);
-    strcpy(v.nombre_Sucursal, sucursal.c_str());
+    strcpy(v.sucursal, sucursal.c_str());
 
     return v;
 }
@@ -68,7 +69,7 @@ void ordenar(Vendedor v[],int len){
 		ordenado=false;
 		for(int j=0;j < len - i - 1;j++){
 			Vendedor Aux;
-			 if(v[j].codigo_Vendedor>v[j + 1].codigo_Vendedor){
+			 if(v[j].codigo>v[j + 1].codigo){
 				 Aux = v[j+1];
 				 v[j+1]=v[j];
 				 v[j]=Aux;
@@ -102,9 +103,9 @@ void mostrarArchivo() {
 
     Vendedor v;
     while (fread(&v, sizeof(Vendedor), 1, arch)) {
-        cout << "Codigo: " << v.codigo_Vendedor << endl;
-        cout << "Nombre: " << v.nombre_Vendedor << endl;
-        cout << "Sucursal: " << v.nombre_Sucursal << endl;
+        cout << "Codigo: " << v.codigo << endl;
+        cout << "Nombre: " << v.nombre << endl;
+        cout << "Sucursal: " << v.sucursal << endl;
         cout << "-----------------------------" << endl;
     }
 
@@ -122,7 +123,7 @@ void cargarVendedores() {
             break;
         }
         Vendedor nuevo = pedirDatos();
-        if (existeCodigo(nuevo.codigo_Vendedor, lista, len)) {
+        if (existeCodigo(nuevo.codigo, lista, len)) {
             cout << "Error: ese codigo ya existe." << endl;
         } else {
             lista[len++] = nuevo;
@@ -135,10 +136,9 @@ void cargarVendedores() {
     ordenar(lista, len);
     guardarTodoEnArchivo(lista, len);
 }
-
-/*int main() {
+int main() {
     cargarVendedores();
     cout << "\nVendedores registrados:\n";
     mostrarArchivo();
     return 0;
-}*/
+}
