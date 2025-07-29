@@ -11,22 +11,24 @@
  ✅ **Tip**: Validar que el vendedor exista al momento de registrar la venta.*/
 
 #include <iostream>
-#include <cstdio>
+#include <cstring>
 using namespace std;
 
 const int MAX_VENTAS = 1000;
 const int MAX_VENDEDORES = 100;
 
-struct Vendedor {
-	int codigo_Vendedor;
-	char nombre_Vendedor[26];
-	char nombre_Sucursal[31];
+
+struct Vendedor{
+	int codigo;
+	char nombre[50];
+	char sucursal[50];
 };
+
 struct Venta {
 	int fecha;
-	int codigo_Vendedor;
-	int codigo_Producto;
-	float monto;
+	int codigo_vendedor;
+	int codigo_producto;
+	float monto_venta;
 };
 void cargarVendedores(Vendedor vec[],int& len) {
 	FILE *arch = fopen("Vendedores.dat", "rb");
@@ -50,9 +52,9 @@ void guardarTodoEnArchivo(Venta ventas[], int lenVentas) {
 	fclose(arch);
 	cout << "\nVentas registradas con exito." << endl;
 }
-bool vendedorExiste(int codigo, Vendedor vec[], int len) {
+bool vendedorExiste(int codigoext, Vendedor vec[], int len) {
 	for (int i = 0; i < len; i++) {
-		if (vec[i].codigo_Vendedor == codigo)
+		if (vec[i].codigo == codigoext)
 			return true;
 	}
 	return false;
@@ -78,15 +80,15 @@ void cargarVentas() {
 		cout << "Ingrese fecha de la venta (AAAAMMDD): ";
 		cin >> nueva.fecha;
 		cout << "Ingrese codigo del vendedor: ";
-		cin >> nueva.codigo_Vendedor;
-		if (!vendedorExiste(nueva.codigo_Vendedor, vendedores, lenVendedores)) {
+		cin >> nueva.codigo_vendedor;
+		if (!vendedorExiste(nueva.codigo_vendedor, vendedores, lenVendedores)) {
 			cout << "Error: el codigo de vendedor no existe." << endl;
 			continue;
 		}
 		cout << "Ingrese codigo del producto: ";
-		cin >> nueva.codigo_Producto;
+		cin >> nueva.codigo_producto;
 		cout << "Ingrese monto de la venta: ";
-		cin >> nueva.monto;
+		cin >> nueva.monto_venta;
 		ventas[lenVentas++] = nueva;
 		cout << "¿Desea ingresar otra venta? (s/n): ";
 		cin >> seguir;
@@ -104,15 +106,15 @@ void mostrarVentas() {
 	cout << "\nVentas registradas:\n";
 	while (fread(&v, sizeof(Venta), 1, arch)) {
 		cout << "Fecha: " << v.fecha << endl;
-		cout << "Vendedor: " << v.codigo_Vendedor << endl;
-		cout << "Producto: " << v.codigo_Producto << endl;
-		cout << "Monto: $" << v.monto << endl;
+		cout << "Vendedor: " << v.codigo_vendedor << endl;
+		cout << "Producto: " << v.codigo_producto << endl;
+		cout << "Monto: $" << v.monto_venta << endl;
 		cout << "-----------------------------" << endl;
 	}
 	fclose(arch);
 }
-/*int main() {
+int main() {
 	cargarVentas();
 	mostrarVentas();
 	return 0;
-}*/
+}
