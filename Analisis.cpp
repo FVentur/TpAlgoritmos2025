@@ -11,7 +11,7 @@
  - Agrupar ventas por vendedor y sucursal usando **corte de control** o acumulación.
  - Para ranking de productos, contar ocurrencias y luego ordenar.*/
 #include <iostream>
-#include <cstdio>
+#include <cstring>
 using namespace std;
 
 const int MAX_VENTAS = 1000;
@@ -32,7 +32,11 @@ struct mayorVenta {
 	int codigo_Vendedor;
 	float totalRecaudado;
 };
-void cargarVendedoress(Vendedor vec[],int& len){
+struct SucursalTotal {
+	char nombre_Sucursal[31];
+	float totalRecaudado;
+};
+void cargarVendedoress(Vendedor vec[], int &len) {
 	FILE *arch = fopen("Vendedores.dat", "rb");
 	if (!arch) {
 		len = 0;
@@ -73,7 +77,6 @@ void ordenarPorCodigoVendedor(Venta ventas[], int &lenVentas) {
 			break;
 		}
 	}
-
 }
 mayorVenta vendedorQueMasRecaudo(Venta ventas[], int &lenVentas) {
 	mayorVenta MayorVen;
@@ -108,25 +111,70 @@ int buscarVendedor(Vendedor vendedor[], int lenVendedores,
 	}
 	return -1;
 }
-void mostrarVendedor(Vendedor vendedor[], int pos,mayorVenta MayorVen){
+void mostrarVendedor(Vendedor vendedor[], int pos, mayorVenta MayorVen) {
 	cout << "\n===== Vendedor que mas dinero genero fue =====\n";
-    cout << "Nombre: " << vendedor[pos].nombre_Vendedor << endl;
-    cout << "Total recaudado: " << MayorVen.totalRecaudado << endl;
-    cout << "\n-----------------------------" << endl;
+	cout << "Nombre: " << vendedor[pos].nombre_Vendedor << endl;
+	cout << "Total recaudado: " << MayorVen.totalRecaudado << endl;
+	cout << "\n-----------------------------" << endl;
 }
-void vendedorQueMasVendio(Venta ventas[], int &lenVentas, Vendedor vendedor[], int &lenVendedores) {
+void vendedorQueMasVendio(Venta ventas[], int &lenVentas, Vendedor vendedor[],
+		int &lenVendedores) {
 	ordenarPorCodigoVendedor(ventas, lenVentas);
 	mayorVenta MayorVen = vendedorQueMasRecaudo(ventas, lenVentas);
-	int pos=buscarVendedor(vendedor, lenVendedores, MayorVen);
-	mostrarVendedor(vendedor,pos,MayorVen);
+	int pos = buscarVendedor(vendedor, lenVendedores, MayorVen);
+	mostrarVendedor(vendedor, pos, MayorVen);
 }
-void sucursalQueMasVendio(){
+void mostrarMaximoRecaudado(SucursalTotal sucursales[],int lenSucursales, int posMax){
+	cout << "\n===== Sucursal que mas dinero genero fue =====\n";
+	cout << "Sucursal: " << sucursales[posMax].nombre_Sucursal << endl;
+	cout << "Total recaudado: " << sucursales[posMax].totalRecaudado << endl;
+	cout << "----------------------------------------------" << endl;
+}
+void maximoRecaudado(SucursalTotal sucursales[],int lenSucursales){
+	float maxRecaudado = -1;
+	int posMax = -1;
+		for (int i = 0; i < lenSucursales; i++) {
+			if (sucursales[i].totalRecaudado > maxRecaudado) {
+				maxRecaudado = sucursales[i].totalRecaudado;
+				posMax = i;
+			}
+		}
+	mostrarMaximoRecaudado(sucursales,lenSucursales,posMax);
+}
 
+void sucursalQueMasVendio(Venta ventas[], int lenVentas, Vendedor vendedor[],
+		int lenVendedores) {
+	SucursalTotal sucursales[MAX_VENDEDORES];
+	int lenSucursales = 0;
+	for (int i = 0; i < lenVendedores; i++) {
+		char nombreSucursal[31];
+		strcpy(nombreSucursal, vendedor[i].nombre_Sucursal);
+		int pos = -1;
+		for (int j = 0; j < lenSucursales; j++) {
+			if (strcmp(sucursales[j].nombre_Sucursal, nombreSucursal) == 0) {
+				pos = j;
+				break;
+			}
+		}
+		if (pos == -1) {
+			strcpy(sucursales[lenSucursales].nombre_Sucursal, nombreSucursal);
+			sucursales[lenSucursales].totalRecaudado = 0;
+			pos = lenSucursales;
+			lenSucursales++;
+		}
+		for (int k = 0; k < lenVentas; k++) {
+			if (ventas[k].codigo_Vendedor == vendedor[i].codigo_Vendedor) {
+				sucursales[pos].totalRecaudado += ventas[k].monto;
+			}
+		}
+	}
+	maximoRecaudado(sucursales,lenSucursales);
 
 }
-/*rankingProductos() {
+/*
+rankingProductos() {
 
-}*/
+ }*/
 int main() {
 	Venta ventas[MAX_VENTAS];
 	int lenVentas = 0;
@@ -147,12 +195,12 @@ int main() {
 		case 1:
 			vendedorQueMasVendio(ventas, lenVentas, vendedores, lenVendedores);
 			break;
-		/*case 2:
-			sucursalQueMasVendio();
+		case 2:
+			sucursalQueMasVendio(ventas, lenVentas, vendedores, lenVendedores);
 			break;
 		case 3:
-			rankingProductos();
-			break;*/
+			/*rankingProductos();
+		 break;*/
 		case 0:
 			cout << "Saliendo del menu de analisis..." << endl;
 			break;
